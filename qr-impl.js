@@ -107,7 +107,7 @@ function updateCameras() {
 async function readResult(result) {
     turnOff();
     console.log(result);
-    let data = await fetchAsync('http://localhost:3000/verify', JSON.stringify({ "cert": result }));
+    let data = await fetchAsync('https://covid-qr-backend.herokuapp.com/verify', JSON.stringify({ "cert": result }));
     console.log(data);
     resultCard.classList.remove('d-none');
     resultCard.classList.add(data.valid ? 'border-success' : 'border-danger');
@@ -127,8 +127,4 @@ async function fetchAsync(url, bodyData) {
 }
 
 updateCameras();
-let hasCamera = await QrScanner.hasCamera(); // async
-let elem = document.createElement('p');
-elem.innerText = hasCamera;
-document.body.appendChild(elem);
 flashToggle.style.display = 'none';
