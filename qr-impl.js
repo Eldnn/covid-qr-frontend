@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import QrScanner from "./qr-scanner.min.js";
-QrScanner.WORKER_PATH = './qr-scanner/qr-scanner-worker.min.js';
+QrScanner.WORKER_PATH = './qr-scanner-worker.min.js';
 const qrStream = document.getElementById('qr-stream');
 const flashToggle = document.getElementById('flashToggle');
 const stateToggle = document.getElementById('stateToggle');
