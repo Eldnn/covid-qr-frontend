@@ -196,7 +196,7 @@ async function fetchAsync(url, bodyData) {
     return data;
 }
 
-resultCard.getElementsByClassName('card-link')[0].addEventListener('click', changeCardText)
+resultCard.getElementsByClassName('card-link')[0].addEventListener('click', changeCardText);
 
 function changeCardText(event) {
     if (event.target.classList.contains('collapsed')) {
