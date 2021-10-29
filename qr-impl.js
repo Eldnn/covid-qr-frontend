@@ -113,9 +113,25 @@ async function readResult(result) {
     resultCard.getElementsByClassName('card-title')[0].classList.add(data.valid ? 'text-success' : 'text-danger');
     resultCard.getElementsByClassName('card-title')[0].textContent = data.data.nam.gn + ' ' + data.data.nam.fn;
     resultCard.getElementsByClassName('card-text')[0].textContent = data.data.dob;
-    const certType = data.data.v ? 'V' : data.data.t ? 'T' : 'R';
-    let elem = createMoreInformation(data, certType);
-    document.getElementById('collapseInfo').replaceChildren(elem);
+    const isLight = data.type === 'L';
+    if (isLight) {
+        let listContainer = document.createElement('ul');
+        listContainer.classList.add('list-group');
+        let listItemFlag = document.createElement('li');
+        listItemFlag.classList.add('list-group-item');
+        listItemFlag.innerText = getFlagEmoji('CH');
+        let validDate = data.iss_at + 48*60*60*1000;
+        let listItemValid = document.createElement('li');
+        listItemValid.classList.add('list-group-item');
+        listItemValid.innerText = 'Valid through: ' + new Date(validDate).toDateString();
+        listContainer.append(listItemFlag, listItemValid);
+        document.getElementById('collapseInfo').replaceChildren(listContainer);
+    } else {
+        const certType = data.type;
+        let elem = createMoreInformation(data, certType);
+        document.getElementById('collapseInfo').replaceChildren(elem);
+    }
+    
 }
 
 function createMoreInformation(data, certType) {
@@ -147,13 +163,13 @@ function getValidUntilVaccine(data) {
 }
 
 function getValidUntilTest(data) {
-    let test_time = cert_data.sc;
-    let validDuration = (cert_data.tt === 'LP6464-4' ? 72*60*60*1000 : 48*60*60*1000);
+    let test_time = data.sc;
+    let validDuration = (data.tt === 'LP6464-4' ? 72*60*60*1000 : 48*60*60*1000);
     return new Date(test_time+validDuration).toDateString();
 }
 
 function getValidUntilRecovery(data) {
-    let dateOfTest = cert_data.fr;
+    let dateOfTest = data.fr;
     return new Date(dateOfTest+11*24*60*60*1000).toDateString() + ' - ' + new Date(dateOfTest + 180*34*60*60*1000).toDateString();
 }
 
