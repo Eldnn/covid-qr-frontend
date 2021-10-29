@@ -10,6 +10,9 @@ video {
 canvas {
     display: none;
 }
+.container {
+    width: 500px;
+}
 
 .error {
     border-color: red;
@@ -34,4 +37,22 @@ canvas {
 @keyframes fade-out {
     from { opacity: 1;}
 	to   { opacity: 0;}
+}
+
+#result.border-success #check{
+    display: block;
+    fill: green;
+}
+
+#result.border-danger #check{
+    display: none;
+}
+
+#result.border-danger #cross{
+    display: block;
+}
+
+#result.border-success #cross{
+    display: none;
+    fill: red;
 }

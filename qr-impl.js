@@ -73,7 +73,6 @@ fileSelector.addEventListener('change', event => {
     QrScanner.scanImage(file)
         .then(result => readResult(result))
         .catch((e) => {
-            console.log('TEST');
             setTimeout(() => {
                 filePrev.classList.add('d-none', 'border-dark');
                 filePrev.classList.remove('error', 'border-danger');
@@ -111,9 +110,61 @@ async function readResult(result) {
     console.log(data);
     resultCard.classList.remove('d-none');
     resultCard.classList.add(data.valid ? 'border-success' : 'border-danger');
+    resultCard.getElementsByClassName('card-title')[0].classList.add(data.valid ? 'text-success' : 'text-danger');
     resultCard.getElementsByClassName('card-title')[0].textContent = data.data.nam.gn + ' ' + data.data.nam.fn;
     resultCard.getElementsByClassName('card-text')[0].textContent = data.data.dob;
+    const certType = data.data.v ? 'V' : data.data.t ? 'T' : 'R';
+    let elem = createMoreInformation(data, certType);
+    document.getElementById('collapseInfo').replaceChildren(elem);
 }
+
+function createMoreInformation(data, certType) {
+    let cert_data = certType === 'V' ? data.data.v[0] : certType === 'T' ? data.data.t[0] : data.data.r[0];
+    let flag = getFlagEmoji(cert_data.ci.split(':')[3]);
+
+    let listContainer = document.createElement('ul');
+    listContainer.classList.add('list-group');
+
+    let listItemFlag = document.createElement('li');
+    listItemFlag.classList.add('list-group-item');
+    listItemFlag.innerText = flag + cert_data.is;
+    let listItemType = document.createElement('li');
+    listItemType.classList.add('list-group-item');
+    listItemType.innerText = certType === 'V' ? '💉' : certType === 'T' ? '🧪' : '🤒';
+    let listItemValid = document.createElement('li');
+    listItemValid.classList.add('list-group-item');
+    listItemValid.innerText = 'Valid through: ' + certType === 'V' ? getValidUntilVaccine(cert_data) : certType === 'T' ? getValidUntilTest(cert_data) : getValidUntilRecovery(cert_data);
+
+    listContainer.appendChild(listItemFlag);
+    listContainer.appendChild(listItemType);
+    listContainer.appendChild(listItemValid);
+    return listContainer;
+}
+
+function getValidUntilVaccine(data) {
+    let dateOfVacc = new Date(data.dt);
+    return new Date(dateOfVacc.setFullYear(dateOfVacc.getFullYear()+1)-24*60*60*1000).toDateString();
+}
+
+function getValidUntilTest(data) {
+    let test_time = cert_data.sc;
+    let validDuration = (cert_data.tt === 'LP6464-4' ? 72*60*60*1000 : 48*60*60*1000);
+    return new Date(test_time+validDuration).toDateString();
+}
+
+function getValidUntilRecovery(data) {
+    let dateOfTest = cert_data.fr;
+    return new Date(dateOfTest+11*24*60*60*1000).toDateString() + ' - ' + new Date(dateOfTest + 180*34*60*60*1000).toDateString();
+}
+
+function getFlagEmoji(countryCode) {
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char =>  127397 + char.charCodeAt());
+    return String.fromCodePoint(...codePoints);
+  }
+  
 
 async function fetchAsync(url, bodyData) {
     let response = await fetch(url, {
@@ -124,6 +175,16 @@ async function fetchAsync(url, bodyData) {
     });
     let data = await response.json();
     return data;
+}
+
+resultCard.getElementsByClassName('card-link')[0].addEventListener('click', changeCardText)
+
+function changeCardText(event) {
+    if (event.target.classList.contains('collapsed')) {
+        event.target.textContent = 'More Information';
+    } else {
+        event.target.textContent = 'Hide Information';
+    }
 }
 
 updateCameras();
