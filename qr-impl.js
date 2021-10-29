@@ -2,6 +2,9 @@
 
 import QrScanner from "./qr-scanner.min.js";
 QrScanner.WORKER_PATH = './qr-scanner-worker.min.js';
+
+const VERIFY_URL = 'https://covid-qr-backend.herokuapp.com/verify';
+
 const qrStream = document.getElementById('qr-stream');
 const flashToggle = document.getElementById('flashToggle');
 const stateToggle = document.getElementById('stateToggle');
@@ -106,7 +109,7 @@ function updateCameras() {
 async function readResult(result) {
     turnOff();
     console.log(result);
-    let data = await fetchAsync('https://covid-qr-backend.herokuapp.com/verify', JSON.stringify({ "cert": result }));
+    let data = await fetchAsync(VERIFY_URL, JSON.stringify({ "cert": result }));
     console.log(data);
     resultCard.classList.remove('d-none');
     resultCard.classList.add(data.valid ? 'border-success' : 'border-danger');
